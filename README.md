@@ -83,7 +83,7 @@ Class Payment implements Payment {
     address: - Адрес доставки
 }
 
-Класс Presenter для формысо Способами оплаты
+Класс Presenter для формы со Способами оплаты
 class PresenterPayment implements PresenterPayment {
     selectMethod: - Функция позваоляющая выбирать способ оплаты
     addAddress: - Функция, позволяющая изменять поле с адресом
