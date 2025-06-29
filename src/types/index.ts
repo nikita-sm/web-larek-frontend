@@ -1,80 +1,46 @@
-/*Интерфейс одной конкретной карточки. Приходит с сервера*/
-interface ProductItem {
-    id: string,
-    description: string,
-    image: string,
-    title: string,
-    category: string,
-    price: number
+/*Интерфейс для 1-й карточки, приходящей с сервера. Эти данные отрисовываются внутри карточки на главной странице*/
+interface I_CardItem {
+    categoty: string;
+    description: string;
+    id: string;
+    image: string;
+    price: number;
+    title: string;
+};
+
+/*Интерфейс для массива всех карточек, приходящих с сервера. Этот массив карточек отрисовывается на главной странице сайта*/
+interface I_CardItemList {
+    list: I_CardItem[]
 }
 
-/*Интерфейс всех карточек приходящих с сервера*/
-interface ProductList {
-    total: number,  /*Общее количество карточек*/
-    items: ProductItem[],  /*массив карточек с интерфейсом Item*/
+/*Интерфейс для 1-го товара, находящегося в корзине*/
+interface I_BasketItem {
+    title: string;
+    price: number;
 }
 
-interface PresenterProductList {
-    clickCard: Function, /* Клик по карточке товара. После клика происходит открытие модального окна для данного товара */
-    fetch: Function /* Запрос карточек с сервера */
+/*Интерфейс для всех товаров в корзине - они хранятся в виде массива*/
+interface I_BasketItemList {
+    list: I_BasketItem[];
 }
 
-interface ViewProductList {
-    render: Function, /* Отрисовка на странице карточек, полученных с сервера */
-
+/*Интерфейс для модального окна (формы) со способами оплаты и адресом доставки*/
+interface I_PaymentsAndAddress {
+    payments: string;
+    address: string;
 }
 
-/*======== Интерфейс даннных для Корзины ========*/
-interface ItemInBasket { /*Один конкретный товар в корзине*/
-    product: ProductItem, /* Товар в корзине. Он соответствует интерфейсу ProductItem */
+/*Интерфейс для модального окна (формы) c номером телефона и электронным адресом*/
+interface I_EmailAndPhone {
+    email: string;
+    phone: string;
 }
 
-interface Basket { /*Вся корзина*/
-    priducts: ItemInBasket[]; /*Товраы в корзине содержатся в виде массива*/
-    totalPrice: number, /*Суммарная стоимость всех товаров в корзине*/ 
-}
 
-interface PresenterBasket {
-    addItem: Function, /* Добавление товара в корзину */
-    removeItem: Function, /* Удаление товара из корзины */ 
-    calculateTotalPrice: Function /* Расчитать суммарную стоимость товаров в корзине */
-}
 
-interface ViewBasket {
-    render: Function, /* Отрисовка корзины. Срабатывает при каждом изменении массива данных корзины, то есть при срабатывании методов addItem и removeItem */
-}
 
-/*======== Интерфейсы для Формы Способов оплаты ========*/
-interface Payment {
-    methods: string, /* Способы оплаты */
-    address: string, /* Адрес доставки */
-}
 
-interface PresenterPayment {
-    selectMethod: Function, /* Выбор способа оплаты */
-    addAddress: Function, /* Установить адрес доставки */
-    submitPayment: Function, /* Отправить формы с выбором способа оплаты на сервер*/
-}
 
-interface ViewPayment {
-    render: Function, /* Отрисовка формы со способами оплаты. Срабатывает при каждом срабатывании методов selectMethod и addAddress */
-}
 
-/*======== Интерфейсы для Формы Контактных данных ========*/
-interface Contacts {
-    email: string, /* Поле электронной почты */
-    telephone: string, /* Поле для номера телефона */
-}
 
-interface PresenterContacts {
-    addEmail: Function, /* Добавить адрес электронной почты */
-    addTelephone: Function, /* Добавить номер телефона*/
-    submitContacts: Function, /* Отправить Форму с контактными данными на сервер */
-}
-
-interface ViewContacts {
-    render: Function, /* Отрисовка формы с контактными даннными. Срабатывает при каждом срабатывании методов addEmail и addTelephone */
-}
-
-/*======== Интерфейсы для Карточек товаров, отрисованных на странице ========*/
 

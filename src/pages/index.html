@@ -27,7 +27,9 @@
 			</div>
 		</header>
 
-		<main class="gallery"></main>
+		<main class="gallery">
+			<ul class="gallery__list"></ul>
+		</main>
 	</div>
 
 	<div class="modal" id="modal-container">
@@ -39,7 +41,7 @@
 		</div>
 	</div>
 
-	<div class="modal modal_active">
+	<div class="modal"> <!-- Удалил класс modal_active -->
 		<div class="modal__container">
 			<button class="modal__close" aria-label="закрыть"></button>
 			<div class="modal__content">
@@ -156,6 +158,7 @@
 		</div>
 	</div>
 
+	<!-- Заказ успешно оформлен 1921-->
 	<template id="success">
 		<div class="order-success">
 			<h2 class="order-success__title">Заказ оформлен</h2>
@@ -164,6 +167,7 @@
 		</div>
 	</template>
 
+	<!-- Шаблон карточки на главной странице 1920 -->
 	<template id="card-catalog">
 		<button class="gallery__item card">
 			<span class="card__category card__category_soft">софт-скил</span>
@@ -173,6 +177,7 @@
 		</button>
 	</template>
 
+	<!-- Модальное окно 1-й конкретной карточки товара. Карточка открыта 1927-->
 	<template id="card-preview">
 		<div class="card card_full">
 			<img class="card__image" src="<%=require('../images/Subtract.svg')%>" alt="" />
@@ -188,6 +193,7 @@
 		</div>
 	</template>
 
+	<!-- Шаблон строки внутри корзины - в момент когда товар добавлен в корзину 1926-->
 	<template id="card-basket">
 		<li class="basket__item card card_compact">
 			<span class="basket__item-index">1</span>
@@ -197,6 +203,7 @@
 		</li>
 	</template>
 
+	<!-- Модальное окно корзины со списком всех товаров 1926-->
 	<template id="basket">
 		<div class="basket">
 			<h2 class="modal__title">Корзина</h2>
@@ -208,6 +215,7 @@
 		</div>
 	</template>
 
+	<!-- Модальное окно со способами оплаты 1925 - 1924  -->
 	<template id="order">
 		<form class="form" name="order">
 			<div class="order">
@@ -230,6 +238,7 @@
 		</form>
 	</template>
 
+	<!-- Модальное окно с контактными данными:  телефон и почта 1923 - 1922 -->
 	<template id="contacts">
 		<form class="form" name="contacts">
 			<div class="order">

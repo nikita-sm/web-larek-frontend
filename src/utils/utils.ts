@@ -1,3 +1,4 @@
+
 export function pascalToKebab(value: string): string {
     return value.replace(/([a-z0–9])([A-Z])/g, "$1-$2").toLowerCase();
 }
@@ -12,7 +13,8 @@ export function isEmpty(value: any): boolean {
 
 export type SelectorCollection<T> = string | NodeListOf<Element> | T[];
 
-export function ensureAllElements<T extends HTMLElement>(selectorElement: SelectorCollection<T>, context: HTMLElement = document as unknown as HTMLElement): T[] {
+export
+ function ensureAllElements<T extends HTMLElement>(selectorElement: SelectorCollection<T>, context: HTMLElement = document as unknown as HTMLElement): T[] {
     if (isSelector(selectorElement)) {
         return Array.from(context.querySelectorAll(selectorElement)) as T[];
     }
