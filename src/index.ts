@@ -39,9 +39,9 @@ api.get("/product/")
         console.log(cards);
     })
 
-const listELement = document.querySelector(".gallery__list") as HTMLUListElement;
+/* const listELement = document.querySelector(".gallery__list") as HTMLUListElement;
 const cardTemplate = document.querySelector("#card-catalog") as HTMLTemplateElement;
 const card1 = new Card(cloneTemplate(cardTemplate));
 
 listELement.appendChild(card1.render());
-card1.categoryValue = "Тест";
+card1.categoryValue = "Тест"; */

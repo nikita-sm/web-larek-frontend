@@ -1,5 +1,5 @@
 /*Интерфейс для 1-й карточки, приходящей с сервера. Эти данные отрисовываются внутри карточки на главной странице*/
-interface I_CardItem {
+export interface I_CardItem {
     categoty: string;
     description: string;
     id: string;
@@ -14,7 +14,8 @@ interface I_CardItemList {
 }
 
 /*Интерфейс для 1-го товара, находящегося в корзине*/
-interface I_BasketItem {
+export interface I_BasketItem {
+    id: number;
     title: string;
     price: number;
 }
@@ -25,13 +26,13 @@ interface I_BasketItemList {
 }
 
 /*Интерфейс для модального окна (формы) со способами оплаты и адресом доставки*/
-interface I_PaymentsAndAddress {
+export interface I_PaymentsAndAddress {
     payments: string;
     address: string;
 }
 
 /*Интерфейс для модального окна (формы) c номером телефона и электронным адресом*/
-interface I_EmailAndPhone {
+export interface I_EmailAndPhone {
     email: string;
     phone: string;
 }
