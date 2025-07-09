@@ -13,6 +13,14 @@ export abstract class Component<T> {
         element.classList.toggle(className, force);
     }
 
+    addClass(element: HTMLElement, className: string, force?: boolean) {
+        element.classList.add(className);
+    }
+
+    removeClass(element: HTMLElement, className: string, force?: boolean) {
+        element.classList.remove(className);
+    }
+
     // Установить текстовое содержимое
     protected setText(element: HTMLElement, value: unknown) {
         if (element) {

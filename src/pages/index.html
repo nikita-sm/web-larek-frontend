@@ -21,14 +21,14 @@
 				<a class="header__logo" href="/">
 					<img class="header__logo-image" src="<%=require('../images/logo.svg')%>" alt="Film! logo" />
 				</a>
-				<span class="header__basket-counter">0</span>
 				<button class="header__basket">
+					<span class="header__basket-counter">0</span>
 				</button>
 			</div>
 		</header>
 
 		<main class="gallery">
-			<ul class="gallery__list"></ul>
+			<!-- <ul class="gallery__list"></ul> -->
 		</main>
 	</div>
 
@@ -41,7 +41,7 @@
 		</div>
 	</div>
 
-	<div class="modal"> <!-- Удалил класс modal_active -->
+	<div class="modal"> <!-- Модальное окно для карточки превью -->
 		<div class="modal__container">
 			<button class="modal__close" aria-label="закрыть"></button>
 			<div class="modal__content">
@@ -61,7 +61,7 @@
 		</div>
 	</div>
 
-	<div class="modal">
+	<div class="modal"> <!-- Модальное окно корзины -->
 		<div class="modal__container">
 			<button class="modal__close" aria-label="закрыть"></button>
 			<div class="modal__content">
@@ -96,7 +96,7 @@
 		</div>
 	</div>
 
-	<div class="modal">
+	<div class="modal modal_order">
 		<div class="modal__container">
 			<button class="modal__close" aria-label="закрыть"></button>
 			<div class="modal__content">
@@ -105,24 +105,24 @@
 						<div class="order__field">
 							<h2 class="modal__title">Способ оплаты</h2>
 							<div class="order__buttons">
-								<button type="button" class="button button_alt">Онлайн</button>
-								<button type="button" class="button button_alt">При получении</button>
+								<button type="button" data-payment="online" class="button button_alt payment_online">Онлайн</button>
+								<button type="button" data-payment="cash" class="button button_alt payment_cash">При получении</button>
 							</div>
 						</div>
 						<label class="order__field">
 							<span class="form__label modal__title">Адрес доставки</span>
-							<input class="form__input" type="text" placeholder="Введите адрес" />
+							<input class="form__input" type="text" placeholder="Введите адрес" autocomplete="off"/>
 						</label>
 					</div>
 					<div class="modal__actions">
-						<button disabled class="button">Далее</button>
+						<button disabled class="button order__button">Далее</button>
 					</div>
 				</form>
 			</div>
 		</div>
 	</div>
 
-	<div class="modal">
+	<div class="modal modal_contacts">
 		<div class="modal__container">
 			<button class="modal__close" aria-label="закрыть"></button>
 			<div class="modal__content">
@@ -130,11 +130,11 @@
 					<div class="order">
 						<label class="order__field">
 							<span class="form__label modal__title">Email</span>
-							<input class="form__input" type="text" placeholder="Введите Email" />
+							<input class="form__input email" type="text" placeholder="Введите Email" autocomplete="off"/>
 						</label>
 						<label class="order__field">
 							<span class="form__label modal__title">Телефон</span>
-							<input class="form__input" type="text" placeholder="+7 (" />
+							<input class="form__input phone" type="text" placeholder="+7 (" autocomplete="off"/>
 						</label>
 					</div>
 					<div class="modal__actions">
@@ -145,7 +145,7 @@
 		</div>
 	</div>
 
-	<div class="modal">
+	<div class="modal modal_success">
 		<div class="modal__container">
 			<button class="modal__close" aria-label="закрыть"></button>
 			<div class="modal__content">
@@ -179,18 +179,22 @@
 
 	<!-- Модальное окно 1-й конкретной карточки товара. Карточка открыта 1927-->
 	<template id="card-preview">
-		<div class="card card_full">
-			<img class="card__image" src="<%=require('../images/Subtract.svg')%>" alt="" />
-			<div class="card__column">
-				<span class="card__category card__category_other">другое</span>
-				<h2 class="card__title">Бэкенд-антистресс</h2>
-				<p class="card__text">Если планируете решать задачи в тренажёре, берите два.</p>
-				<div class="card__row">
-					<button class="button card__button">В корзину</button>
-					<span class="card__price">1000 синапсов</span>
+		<div class="card__overlay unvisible">
+			<div class="card card_full">
+				<img class="card__image" src="<%=require('../images/Subtract.svg')%>" alt="" />
+				<div class="card__column">
+					<span class="card__category card__category_other">другое</span>
+					<h2 class="card__title">Бэкенд-антистресс</h2>
+					<p class="card__text">Если планируете решать задачи в тренажёре, берите два.</p>
+					<div class="card__row">
+						<button class="button card__button">В корзину</button>
+						<span class="card__price">1000 синапсов</span>
+					</div>
 				</div>
+				<div class="btn__close">X</div>
 			</div>
 		</div>
+		
 	</template>
 
 	<!-- Шаблон строки внутри корзины - в момент когда товар добавлен в корзину 1926-->
@@ -205,14 +209,17 @@
 
 	<!-- Модальное окно корзины со списком всех товаров 1926-->
 	<template id="basket">
-		<div class="basket">
+		<div class="basket__overlay unvisible">
+	 	<div class="basket">
 			<h2 class="modal__title">Корзина</h2>
+			<div class="basket__close">Х</div>
 			<ul class="basket__list"></ul>
 			<div class="modal__actions">
 				<button class="button basket__button">Оформить</button>
 				<span class="basket__price">0 синапсов</span>
 			</div>
 		</div>
+	</div>
 	</template>
 
 	<!-- Модальное окно со способами оплаты 1925 - 1924  -->
@@ -222,8 +229,8 @@
 				<div class="order__field">
 					<h2 class="modal__title">Способ оплаты</h2>
 					<div class="order__buttons">
-						<button name="card" type="button" class="button button_alt">Онлайн</button>
-						<button name="cash" type="button" class="button button_alt">При получении</button>
+						<button name="card" type="button" class="button button_alt payment_online">Онлайн</button>
+						<button name="cash" type="button" class="button button_alt payment_cash">При получении</button>
 					</div>
 				</div>
 				<label class="order__field">
