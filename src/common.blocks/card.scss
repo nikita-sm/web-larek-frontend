@@ -1,37 +1,6 @@
 @use "variables" as *;
 @use "mixins";
 
-.card__overlay {
-  background: rgba(79, 79, 79, .6);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1000;
-}
-
-.unvisible {
-  width: 0px;
-  height: 0px;
-  overflow: hidden
-}
-
-.btn__close {
-  width: 62px;
-  min-width: 62px;
-  height: 62px;
-  outline: 1px solid #fff;
-  border-radius: 50%;
-  font-size: 54px;
-  line-height: 58px;
-  text-align: center;
-}
-
-.btn__close:hover {
-  cursor: pointer;
-}
-
 .card {
   @include mixins.flex(column);
   border: 0;
@@ -42,12 +11,7 @@
 
   &_full {
     flex-direction: row;
-    background-color: rgba(14, 32, 55, 1);
-;
-    opacity: 1;
-    width: 65%;
-    margin: 130px auto 0;
-   
+    background-color: transparent;
 
     .card__title {
       flex-grow: 0;

@@ -1,45 +1,29 @@
-import { ensureElement } from "../utils/utils";
-import { Component } from "./base/Component";
-import { EventEmitter } from "./base/events";
+import { ISuccess, ISuccessActions } from '../types';
+import { ensureElement } from '../utils/utils';
+import { Component } from './base/Component';
 
-interface I_Success {
-    total: number;
-    active: 1
-}
+export class Success extends Component<ISuccess> {
+	protected _close: HTMLElement;
+	protected _total: HTMLElement;
 
+	constructor(container: HTMLElement, actions?: ISuccessActions) {
+		super(container);
 
-export class Success extends Component<I_Success> {
-    protected successClose: HTMLButtonElement; /*Кнопка крестика*/
-    protected successBtn: HTMLButtonElement; /*Кнопка - За новыми покупками*/
-    protected successTotal: HTMLElement; /*Суммарная стоимость покупки*/
+		this._close = ensureElement<HTMLElement>(
+			'.order-success__close',
+			this.container
+		);
+		this._total = ensureElement<HTMLElement>(
+			'.order-success__description',
+			this.container
+		);
 
-    constructor(container: HTMLElement, events: EventEmitter) {
-        super(container);
-        this.successClose = ensureElement(".modal__close", this.container) as HTMLButtonElement;
-        this.successBtn = ensureElement(".order-success__close", this.container) as HTMLButtonElement;
-        this.successTotal = ensureElement(".order-success__close", this.container) as HTMLElement;
+		if (actions?.onClick) {
+			this._close.addEventListener('click', actions.onClick);
+		}
+	}
 
-        this.successClose.addEventListener("click", (event) => {
-            events.emit("success:close");
-        });
-
-        this.successBtn.addEventListener("click", () => {
-            events.emit("success:close");
-        });
-
-    };
-
-    set total(total: number) {
-        console.log(total);
-    }
-
-    set active(active: number){
-        this.toggleClass(this.container, "modal_active");
-    }
-
-    render(data: Partial<I_Success>) : HTMLElement {
-       /*  console.log(data); */
-        Object.assign(this as object, data);
-        return this.container;
-    }
+	set total(total: number | string) {
+		this.setText(this._total, `Списано ${total} синапсов`);
+	}
 }

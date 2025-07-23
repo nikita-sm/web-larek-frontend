@@ -1,37 +1,46 @@
-import { ensureElement } from "../utils/utils";
-import { Component } from "./base/Component";
-import { EventEmitter } from "./base/events";
+import {Component} from "./base/Component";
+import {IEvents} from "./base/events";
+import {ensureElement} from "../utils/utils";
 
-interface I_Page {
-    cards: HTMLElement[];
-    counter: number,
-};
+interface IPage {
+    counter: number;
+    catalog: HTMLElement[];
+    locked: boolean;
+}
 
-export class Page extends Component<I_Page> {
-    protected cardsContainer: HTMLElement; /*Элемент для вывода списка карточек*/
-    protected basketButton: HTMLElement; /*Иконка корзины*/
-    protected basketCount: HTMLElement; /*Span с количеством товаров в корзине*/
-    constructor(container: HTMLElement, events: EventEmitter) {
+export class Page extends Component<IPage> {
+    protected _counter: HTMLElement; /*Счетчик*/
+    protected _catalog: HTMLElement; /*Каталог карточек*/
+    protected _wrapper: HTMLElement; /*Обертка*/
+    protected _basket: HTMLElement; /*Кнопка-иконка для корзины*/
+
+
+    constructor(container: HTMLElement, protected events: IEvents) {
         super(container);
-        this.cardsContainer = ensureElement(".gallery", this.container);
-        this.basketButton = ensureElement(".header__basket", this.container);
-        this.basketCount = ensureElement(".header__basket-counter", this.container)
-        this.basketButton.addEventListener("click", function(){
-            events.emit("basket:open");
-        })
-    };
 
-    /*Отрисовываю карточки на главной странице*/
-    set cards(cardsArray: HTMLElement[]){
-        this.cardsContainer.replaceChildren(...cardsArray)
+        this._counter = ensureElement<HTMLElement>('.header__basket-counter');
+        this._catalog = ensureElement<HTMLElement>('.gallery');
+        this._wrapper = ensureElement<HTMLElement>('.page__wrapper');
+        this._basket = ensureElement<HTMLElement>('.header__basket');
+
+        this._basket.addEventListener('click', () => {
+            events.emit("basket:open")
+;        });
     }
 
     set counter(value: number) {
-        this.setText(this.basketCount, value);
+        this.setText(this._counter, String(value));
     }
 
-    render(data: Partial<I_Page>) : HTMLElement {
-        Object.assign(this as object, data);
-        return this.container;
+    set catalog(items: HTMLElement[]) {
+        this._catalog.replaceChildren(...items);
+    }
+
+    set locked(value: boolean) {
+        if (value) {
+            this._wrapper.classList.add('page__wrapper_locked');
+        } else {
+            this._wrapper.classList.remove('page__wrapper_locked');
+        }
     }
 }

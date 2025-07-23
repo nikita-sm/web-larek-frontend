@@ -6,6 +6,7 @@ export interface I_CardItem {
     image: string;
     price: number;
     title: string;
+    selected: boolean;
 };
 
 /*Интерфейс для 1-го товара, находящегося в корзине*/
@@ -15,18 +16,56 @@ export interface I_BasketItem {
     price: number;
 }
 
-/*Интерфейс для модального окна (формы) со способами оплаты и адресом доставки*/
-export interface I_PaymentsAndAddress {
-    payments?: string;
-    address?: string;
+
+/*Интерфейс для состояния формы*/
+export interface IFormState {
+	valid: boolean;
+	errors: string[];
 }
 
-/*Интерфейс для модального окна (формы) c номером телефона и электронным адресом*/
-export interface I_EmailAndPhone {
-    email?: string;
-    phone?: string;
+// Интерфейс для состояния формы Order: способы оплаты и адрес доставки
+export interface IOrderForm {
+	payment: string;
+	address: string;
 }
 
+// Интерфейс для состояния формы Order: способы оплаты и адрес доставки
+export interface IContactsForm {
+    email: string,
+    telephone: string,
+}
+
+/*Интерфейс, который объединяет все свойства из IOrderForm + IOrderForm + total, items*/
+export interface IOrder extends IOrderForm, IContactsForm {
+    total: number,
+    items: string[],
+}
+
+/*Интерфейс, которые объединяет все свойства из IContactsForm + items*/
+export interface IContacts extends IContactsForm {
+	items: string[];
+}
+
+/*Интерфейс для события клика на html-элементах [на модальных окнах]*/
+export interface IActions {
+	onClick: (event: MouseEvent) => void;
+}
+
+/*Интерфейс для события клика по Success*/
+export interface ISuccessActions {
+	onClick: () => void;
+}
+
+// Оформление заказа
+export interface ISuccess {
+	id: string;
+	total: number;
+}
+/*Тип (интерфейс) объекта для описания ошибок при валидации формы Order*/ 
+export type FormErrorsOrder = Partial<Record<keyof IOrder, string>>;
+
+/*Тип (интерфейс) объекта для описания ошибок при валидации формы Contacts*/
+export type FormErrorsContacts = Partial<Record<keyof IContacts, string>>;
 
 
 

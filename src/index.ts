@@ -1,15 +1,14 @@
 import { Api } from './components/base/api';
-import { Card } from './components/Card';
-import { Page } from './components/Page';
 import './scss/styles.scss';
 import { EventEmitter } from './components/base/events';
-import { Model } from './components/Model';
-import { API_URL } from './utils/constants';
-import { CDN_URL } from './utils/constants';
+import { API_URL, CDN_URL, PaymentMethods } from './utils/constants';
 import { ensureElement, cloneTemplate } from './utils/utils';
-import { Preview } from './components/Preview';
-import { Basket } from './components/Basket';
-import { BasketItem } from './components/BasketItem';
+import { Modal } from './components/common/Modal';
+import { Page } from './components/Page';
+import { Model } from './components/Model';
+import { I_CardItem, IOrderForm, IOrder, IContactsForm } from './types';
+import { Card, CardItem, CardItemPreview, CardItemBasket } from './components/Card';
+import { Basket } from './components/common/Basket';
 import { Order } from './components/Order';
 import { Contacts } from './components/Contacts';
 import { Success } from './components/Success';
@@ -18,193 +17,229 @@ import { Success } from './components/Success';
 const api = new Api(API_URL);
 const events = new EventEmitter();
 const model = new Model(events);
-const cardTemplate = document.querySelector("#card-catalog") as HTMLTemplateElement;
-const previewTemplate  = document.querySelector("#card-preview") as HTMLTemplateElement;
-const basketItemTemplate = document.querySelector("#card-basket") as HTMLTemplateElement;
-const basketTemplate = document.querySelector("#basket") as HTMLTemplateElement;
-const page = new Page(document.querySelector(".page") as HTMLElement, events);
-
-const order = new Order(document.querySelector(".modal_order"), events);
-const contacts = new Contacts(document.querySelector(".modal_contacts"), events)
-const success = new Success(document.querySelector(".modal_success"), events);
 
 type Result = {
     total: number;
     items: any[];
 }
 
+
+/*Получить все шаблоны*/
+const successTemplate = ensureElement<HTMLTemplateElement>("#success");
+const cardCatalogTemplate = ensureElement<HTMLTemplateElement>("#card-catalog");
+const cardPreviewTemplate = ensureElement<HTMLTemplateElement>("#card-preview");
+const cardBasketTemplate = ensureElement<HTMLTemplateElement>("#card-basket");
+const basketItemTemplate = ensureElement<HTMLTemplateElement>("#basket");
+const orderTemplate = ensureElement<HTMLTemplateElement>("#order");
+const contactsTemplate = ensureElement<HTMLTemplateElement>("#contacts");
+
+/*Глобальный контейнер*/
+const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events); /*Модальное окно*/
+const page = new Page(document.body, events); /*Страница*/
+
+/**Переиспользуемые части приложения*/
+const basket = new Basket(cloneTemplate(basketItemTemplate), events)
+/* const order = new Form(cloneTemplate(orderTemplate), events); Можно пока не использовать данный элемент */
+const order = new Order(cloneTemplate(orderTemplate), events, {
+    onClick: (evt: Event) => events.emit('payment:toggle', evt.target),
+});
+
+const contacts = new Contacts(cloneTemplate(contactsTemplate), events);
+
+/*Загрузка данных с сервера*/
 api.get("/product/")
     .then((res: Result) => {
-        const {items} = res; //Получение массива карточек без нормального адреса карточек
+        const {items} = res; 
         const cards = items.map((card) => {
             return {
                 ...card,
                 image: CDN_URL + card.image,
-                price: !card.price ? 2 : card.price, /*Заменяю значение null на значение 2*/
+                selected: false,
             }
         });
         model.setCards(cards);
+
     })
     .catch(err => {
         console.log(err);
     });
 
-events.on("cards:set", () => {
-    const cardsHTMLArray = model.getCards().map(item => new Card(cloneTemplate(cardTemplate), events).render(item))
+
+/*Сохранить карточки, пришедшие с сервера в массив*/
+events.on("cards:set", (data: {cards: I_CardItem[]}) => {
+    console.log(data.cards);
+    const cardsHtmlArray = data.cards.map(item => new CardItem('card', cloneTemplate(cardCatalogTemplate), {
+        onClick: () => events.emit("card:open", item)
+    }).render({
+        title: item.title,
+        price: item.price,
+        img: item.image,
+        id: item.id,
+        category: item.category,
+    }));
     page.render({
-        cards: cardsHTMLArray,
-        counter: model.getBasketItemCount(),
+        catalog: cardsHtmlArray,
     });
 });
 
-
-const preview = new Preview(cloneTemplate(previewTemplate), events);
-events.on("card-preview:open", ({id}: {id: string}) => {
-    const inBasket = model.inBasket(id);
-    const {category, title, description, image, price} = model.getCard(id);
-    preview.render({
-                category,
-                title,
-                description,
-                image,
-                price,
-                visible: true,
-                id,
-                inBasket,
-            });
-});
-
-events.on("card-preview:close", ({id}: {id: string}) => {
-    preview.render({
-        visible: false,
-    })
-});
-
-/*Изменение товаров в корзине*/
-events.on("basket:changed", (data: {id: string}) => {
-    const idCard = data.id
-    const card = model.getCard(idCard);
-    const {id, title, price} = card;
-    const inBasket = model.updateBasketItems({
-        id, title, price
+/*Открыть карточку товара - открыть Превью*/
+events.on("card:open", (card: I_CardItem) => {
+    const preview = new CardItemPreview("card", cloneTemplate(cardPreviewTemplate), {
+        onClick: () => {
+            events.emit("preview:toggle", card);
+            preview.selected = model.checkInBaskey(card) > -1 ? true : false;
+        }
     });
-    preview.render({
-        inBasket: inBasket,
-    })
-    page.render({
-        counter: model.getBasketItemCount(),
-    });
-
-});
-
-/*Событие, которое перерисовывает корзину. Здесь нет взаимодействия с данными*/
-events.on("basket:update", () => {
-    const itemsHTMLArray = model.getBasketItems().map(({id, title, price}, index) => new BasketItem(cloneTemplate(basketItemTemplate), events).render({id, price, title, index}));
     
-    /*Отрисовали массив в корзине*/
-    basket.render({
-        items:itemsHTMLArray,
-        total: model.getTotalPrice(),
-        /* visible: true, */
+    modal.render({
+        content: preview.render(card),
+    })
+});
+
+// Блокируем прокрутку страницы если открыта модалка
+events.on('modal:open', (card) => {
+    
+    page.locked = true;
+});
+
+// ... и разблокируем
+events.on('modal:close', (card) => {
+    page.locked = false;
+});
+
+events.on('preview:toggle', (card: I_CardItem)=> {
+    model.updateBasket(card);
+    page.render({
+        counter: model.getBasketCount(),
     });
-})
+});
 
-
-
-const basket = new Basket(cloneTemplate(basketTemplate), events);
 events.on("basket:open", () => {
-    const cardsHTMLArray = model.getCards().map(item => new Card(cloneTemplate(cardTemplate), events).render(item))
-    page.render({
-        cards: cardsHTMLArray,
-        counter: model.getBasketItemCount(),
-    });
-
-    /*Получили массив html на основе данных из корзины*/
-    const itemsHTMLArray = model.getBasketItems().map(({id, title, price}, index) => new BasketItem(cloneTemplate(basketItemTemplate), events).render({id, price, title, index}));
+    const basketHTMLItems = model.getBasketItems().map((item, i) => new CardItemBasket("card", cloneTemplate(cardBasketTemplate), {
+        onClick: () => events.emit("preview:toggle", item)
+    })
+    .render({
+        index: i + 1,
+        title: item.title,
+        price: item.price,
+    }));
     
-    /*Отрисовали массив в корзине*/
-    basket.render({
-        items:itemsHTMLArray,
-        total: model.getTotalPrice(),
-        visible: true,
+    modal.render({
+        content: basket.render({
+            items: basketHTMLItems,
+            total: model.getBasketTotal(),
+            selected: model.getBasketTotal(),
+        })
     });
 });
 
-events.on("basket:close", (data) => {
+events.on("basket:update", (items: I_CardItem[]) => {
+    const updatesBasketHHTMLItems = items.map((item, i) => new CardItemBasket("card", cloneTemplate(cardBasketTemplate), {
+        onClick: () => events.emit("preview:toggle", item)
+    })
+    .render({
+        index: i + 1,
+        title: item.title,
+        price: item.price,
+    }));
+    /*Перерисовка корзины: строка товара, количество и активная кнопка*/
     basket.render({
-        visible: false,
+        items: updatesBasketHHTMLItems,
+        total: model.getBasketTotal(),
+        selected: model.getBasketTotal(),
     })
 });
 
 events.on("order:open", () => {
-    order.render({
-        active: 1,
-        isValid: model.isValidOrder(),
-    });
-    console.log(model.getOrder());
-});
-
-events.on("order:close", () => {
-    order.render({
-        active: 1,
-    });
-})
-
-events.on("order:set", (data) => {
-    model.setOrderValues(data);
-    order.render({
-        isValid: model.isValidOrder(),
-        payments: model.getOrder().payments,
+    modal.render({
+        content: order.render({
+            address: "",
+            valid: false,
+			errors: [],
+        }),
     })
 });
 
-events.on("contacts:open", () => {
-    contacts.render({
-        active: 1,
-    })
+// Смена способа оплаты
+events.on('payment:toggle', (name: HTMLElement) => {
+	if (!name.classList.contains('button_alt-active')) {
+		order.selectPaymentMethod(name);
+		model.order.payment = PaymentMethods[name.getAttribute('name')];
+	}
 });
 
-events.on("contacts:close", () => {
-    contacts.render({
-        active: 1,
-    });
+events.on(
+	/^order\..*:change/, (data: { field: keyof IOrderForm; value: string }) => {
+		model.setOrderField(data.field, data.value);
+	}
+);
+
+/*Валидация формы Order*/
+events.on('formErrorsOrder:change', (errors: Partial<IOrder>) => {
+	const { address } = errors;
+	order.valid = !address;
+	order.errors = Object.values({ address }).filter(Boolean).join('; ');
 });
 
-events.on("contacts:set", (data) => {
-    model.setContactsValues(data);
-    contacts.render({
-        isValid: model.isValidContacts(),
-    })
+/*Закрыть Order и открыть Contacts*/
+events.on('order:submit', () => {
+	modal.render({
+		content: contacts.render({
+			email: '',
+			telephone: '',
+			valid: false,
+			errors: [],
+		}),
+	});
+	model.order.items = model.getBasketItems().map((item) => item.id);
+    model.order.total = model.getBasketTotal();
 });
 
-events.on("order:request", () => {
-    const {payments, address} = model.getOrder();
-    const {email, phone} = model.getContacts();
-    const total = model.getTotalPrice();
-    const items = model.getBasketItems().map(item => item.id);
+// Изменилось одно из полей формы контактов
+events.on(
+	/^contacts\.[^:]*:change/,
+	(data: { field: keyof IContactsForm; value: string }) => {
+		model.setContactsField(data.field, data.value);
+        console.log(data);
+	}
+);
+
+// Изменилось состояние валидации формы контактов
+events.on('formErrorsContacts:change', (errors: Partial<IOrder>) => {
+	const { email, telephone } = errors;
+	contacts.valid = !email && !telephone;
+	contacts.errors = Object.values({ email, telephone }).filter(Boolean).join('; ');
+});
+
+events.on('contacts:submit', () => {
+    const {payment, address, items, total, telephone, email} = model.getOrder();
     const data = {
-        payment: payments, address, email, phone, total, items
+        payment,
+        address, 
+        items,
+        total,
+        phone: telephone,
+        email,
     };
-    api.post("/order/", data)
-        .then(res => {
-           success.render({
-                active: 1,
-                total: model.getTotalPrice(),
-            });
-        })
+    api.post("/order", data)
+        .then((res: {id: string, total: number})  => {
+            model.clearBasket();
+			page.counter = model.getBasketItems().length;
+			const success = new Success(cloneTemplate(successTemplate), {
+				onClick: () => {
+					modal.close();
+				},
+			});
+			success.total = res.total;
+
+			modal.render({
+				content: success.render({}),
+			});
+		})
+		.catch((err) => {
+			console.error(err);
+		});
 });
 
 
-
-
-events.on("success:close", () => {
-    success.render({
-        active: 1,
-    });
-    model.resetData();
-    page.render({
-        counter: model.getBasketItemCount(),
-    });
-
-});
 

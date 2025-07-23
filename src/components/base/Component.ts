@@ -1,7 +1,7 @@
 /**
  * Базовый компонент
  */
-export abstract class Component<T> {
+export class Component<T> {
     protected constructor(protected readonly container: HTMLElement) {
         // Учитывайте что код в конструкторе исполняется ДО всех объявлений в дочернем классе
     }
@@ -11,14 +11,6 @@ export abstract class Component<T> {
     // Переключить класс
     toggleClass(element: HTMLElement, className: string, force?: boolean) {
         element.classList.toggle(className, force);
-    }
-
-    addClass(element: HTMLElement, className: string, force?: boolean) {
-        element.classList.add(className);
-    }
-
-    removeClass(element: HTMLElement, className: string, force?: boolean) {
-        element.classList.remove(className);
     }
 
     // Установить текстовое содержимое
