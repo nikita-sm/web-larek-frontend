@@ -37,18 +37,16 @@ export class Form<T> extends Component<IFormState> {
     }
 
     protected onInputChange(field: keyof T, value: string) {
-       this.events.emit(`${this.container.name}.${String(field)}:change`, {
-            field,
-            value
-        });
+       this.events.emit('orderInput:change', { field, value});
     }
 
+    /*Валидна ли форма*/
     set valid(value: boolean) {
         this._submit.disabled = !value;
     }
 
+    /*Список ошибок для отрисовки*/
     set errors(value: string) {
-        console.log(value);
         this.setText(this._errors, value);
     }
 
@@ -57,13 +55,5 @@ export class Form<T> extends Component<IFormState> {
         super.render({valid, errors});
         Object.assign(this, inputs);
         return this.container;
-    }
-
-    toggleClass(element: HTMLElement, className: string, force?: boolean) {
-        if (force === undefined) {
-            element.classList.toggle(className);
-        } else {
-            element.classList.toggle(className, force);
-        }
     }
 }

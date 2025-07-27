@@ -1,6 +1,7 @@
 import { Component } from "./base/Component";
 import { ensureElement } from "../utils/utils";
-import { EventEmitter } from "./base/events";
+import { EventEmitter, IEvents } from "./base/events";
+import { categoryColour } from "../utils/constants";
 
 /*Коллбэк для передачи как параметр*/
 interface ICardActions {
@@ -30,8 +31,12 @@ export class Card<T> extends Component<T> {
         this.setText(this._title, value);
     }
 
-    set price(value: number) {
-        this.setText(this._price, `${value} синапсов`);
+    set price(value: number | null) {
+        if(value === null) {
+            this.setText(this._price, `Бесценно`);
+        } else {
+            this.setText(this._price, `${value} синапсов`);
+        }
     }
 
     /* set id(value: string) {
@@ -49,7 +54,6 @@ export class CardItem extends Card<ICardItem> {
     protected _img: HTMLImageElement;
     protected _category: HTMLElement;
     protected _id: string;
-    protected _selected: boolean;
     constructor(protected blockName: string, container: HTMLElement, actions?: ICardActions) {
         super(blockName, container);
         this._img = ensureElement<HTMLImageElement>(`.${blockName}__image`, container);
@@ -65,6 +69,7 @@ export class CardItem extends Card<ICardItem> {
 
     set category(value: string) {
         this.setText(this._category, value);
+        this._category.classList.add(categoryColour[value]);
     }
 
     set id(value: string) {
@@ -95,6 +100,7 @@ export class CardItemPreview extends Card<ICardItemPreview> {
         if (action?.onClick) {
 			this._buttonBasket.addEventListener('click', action.onClick);
 		}
+        
     }
 
     set img(value: string) {
@@ -103,14 +109,23 @@ export class CardItemPreview extends Card<ICardItemPreview> {
 
     set category(value: string) {
         this.setText(this._category, value);
+        this._category.classList.add(categoryColour[value]);
     };
 
     set description(value: string) {
         this.setText(this._description, value);
+        
     };
 
+    set price(value: number | null){
+        if(value === null) {
+            this.setDisabled(this._buttonBasket, true);
+        };
+        
+    }
+
     set selected(value: boolean) {
-        this.setText(this._buttonBasket, value ? "Удалить" : "В Корзину");
+        this.setText(this._buttonBasket, value ? "Удалить" : "Купить");
     }
 
 }
@@ -120,17 +135,13 @@ interface ICardItemBasket extends ICard {
 
 }
 
-
+/*Строка товара внутри корзины*/
 export class CardItemBasket extends Card<ICardItemBasket> {
     protected _index: HTMLImageElement;
-   /*  protected _title: HTMLElement; */
-    /* protected _price: HTMLElement; */
     protected _buttonDelete: HTMLButtonElement;
     constructor(protected blockName: string, container: HTMLElement, action?: ICardActions) {
         super(blockName, container);
         this._index = ensureElement<HTMLImageElement>(`.${blockName}__index`, container);
-        /* this._title = ensureElement<HTMLImageElement>(`.${blockName}__title`, container); */
-       /*  this._price = ensureElement<HTMLImageElement>(`.${blockName}__price`, container); */
         this._buttonDelete= ensureElement<HTMLButtonElement>(`.${blockName}__button`, container);
         if(action?.onClick) {
             this._buttonDelete.addEventListener("click", action.onClick)
@@ -142,12 +153,5 @@ export class CardItemBasket extends Card<ICardItemBasket> {
         this.setText(this._index, value);
     };
 
-    /* set title(value: string) {
-        this.setText(this._title, value);
-    };
-
-    set price(value: number) {
-        this.setText(this._price, value);
-    } */
 }
 

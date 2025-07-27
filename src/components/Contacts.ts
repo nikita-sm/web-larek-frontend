@@ -1,19 +1,18 @@
-import { Form } from './common/Form';
-import { IContactsForm } from '../types';
 import { IEvents } from './base/events';
+import { Form } from './common/Form';
 
-export class Contacts extends Form<IContactsForm> {
+export interface IContacts {
+  phone: string;
+  email: string;
+}
+
+export class Contacts extends Form<IContacts> {
 	constructor(container: HTMLFormElement, events: IEvents) {
-		super(container, events);
-	}
+    	super(container, events);
+  	}
 
-	set phone(value: string) {
-		(this.container.elements.namedItem('phone') as HTMLInputElement).value =
-			value;
-	}
-
-	set email(value: string) {
-		(this.container.elements.namedItem('email') as HTMLInputElement).value =
-			value;
+	resetInputs(){
+		(this.container.elements.namedItem('phone') as HTMLInputElement).value = "";
+		 (this.container.elements.namedItem('email') as HTMLInputElement).value = "";
 	}
 }

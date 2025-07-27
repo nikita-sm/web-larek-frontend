@@ -6,15 +6,8 @@ export interface I_CardItem {
     image: string;
     price: number;
     title: string;
-    selected: boolean;
+/*     selected: boolean; данное поле удаляем*/
 };
-
-/*Интерфейс для 1-го товара, находящегося в корзине*/
-export interface I_BasketItem {
-    id: string;
-    title: string;
-    price: number;
-}
 
 
 /*Интерфейс для состояния формы*/
@@ -25,8 +18,10 @@ export interface IFormState {
 
 // Интерфейс для состояния формы Order: способы оплаты и адрес доставки
 export interface IOrderForm {
-	payment: string;
-	address: string;
+  payment: string;
+  address: string;
+  email: string;
+  phone: string;
 }
 
 // Интерфейс для состояния формы Order: способы оплаты и адрес доставки
@@ -35,37 +30,31 @@ export interface IContactsForm {
     telephone: string,
 }
 
-/*Интерфейс, который объединяет все свойства из IOrderForm + IOrderForm + total, items*/
-export interface IOrder extends IOrderForm, IContactsForm {
-    total: number,
-    items: string[],
+/*Интерфейс для описания полей заказа, которые уходят на сервер*/
+export interface IOrder {
+  items: string[];
+  payment: string;
+  total: number;
+  address: string;
+  email: string;
+  phone: string;
 }
 
-/*Интерфейс, которые объединяет все свойства из IContactsForm + items*/
-export interface IContacts extends IContactsForm {
-	items: string[];
+/*Интерфейс полей формы*/
+export interface IOrderForm {
+  payment: string;
+  address: string;
+  email: string;
+  phone: string;
 }
 
-/*Интерфейс для события клика на html-элементах [на модальных окнах]*/
-export interface IActions {
-	onClick: (event: MouseEvent) => void;
-}
+/*Тип для описани ошибок в форме*/
+/*Частичнвй набор свойств из Интерфейса iOrderForm*/
+export type FormErrors = Partial<Record<keyof IOrderForm, string>>;
 
-/*Интерфейс для события клика по Success*/
-export interface ISuccessActions {
-	onClick: () => void;
+export interface IActions  {
+    onClick: (evt: Event) => void;
 }
-
-// Оформление заказа
-export interface ISuccess {
-	id: string;
-	total: number;
-}
-/*Тип (интерфейс) объекта для описания ошибок при валидации формы Order*/ 
-export type FormErrorsOrder = Partial<Record<keyof IOrder, string>>;
-
-/*Тип (интерфейс) объекта для описания ошибок при валидации формы Contacts*/
-export type FormErrorsContacts = Partial<Record<keyof IContacts, string>>;
 
 
 

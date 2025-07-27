@@ -5,7 +5,6 @@ import {EventEmitter} from "../base/events";
 interface IBasketView {
     items: HTMLElement[];
     total: number;
-    selected: number;
 }
 
 export class Basket extends Component<IBasketView> {
@@ -22,10 +21,11 @@ export class Basket extends Component<IBasketView> {
 
         if (this._button) {
             this._button.addEventListener('click', () => {
-                /* events.emit('order:open'); */
                 events.emit("order:open")
             });
         }
+        /*При создании (загрузке) объекта корзины - сразу присвоить неактивную кнопку, так как товаров вкорзине быть не может*/
+        this.setDisabled(this._button, true);
 
         /* this.items = []; */
     }
@@ -40,16 +40,9 @@ export class Basket extends Component<IBasketView> {
         }
     }
 
-    set selected(count: number) {
-        /* if (items.length) {
-            this.setDisabled(this._button, false);
-        } else {
-            this.setDisabled(this._button, true);
-        } */
-       this.setDisabled(this._button, count === 0);
-    }
 
     set total(total: number) {
-        this.setText(this._total, total);
+        this.setText(this._total, `${total} синапсов`);
+        this.setDisabled(this._button, total === 0)
     }
 }
