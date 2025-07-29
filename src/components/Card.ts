@@ -103,7 +103,7 @@ export class CardItemPreview extends Card<ICardItemPreview> {
         
     }
 
-    set img(value: string) {
+    set image(value: string) {
         this.setImage(this._img, value);
     };
 
