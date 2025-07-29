@@ -49,9 +49,10 @@ api.get("/product/")
     .then((res: Result) => {
         const {items} = res; 
         const cards = items.map((card) => {
+            const url = (CDN_URL + card.image).replace("svg", "png");
             return {
                 ...card,
-                image: CDN_URL + card.image,
+                image: url,
             }
         });
         model.setCards(cards);
@@ -125,6 +126,7 @@ events.on("basket:open", () => {
 });
 
 events.on("basket:update", (items: I_CardItem[]) => {
+    console.log(items);
     const updatesBasketHHTMLItems = items.map((item, i) => new CardItemBasket("card", cloneTemplate(cardBasketTemplate), {
         onClick: () => events.emit("preview:toggle", item)
     })
@@ -196,8 +198,8 @@ events.on('contacts:submit', () => {
             order.disableButtons() /*Сбросил все поля внутри форма Order*/
             contacts.resetInputs(); /*Сбросил все поля внутри форма Contacts*/
             page.counter = 0; /*Обнулили икнонку корзины на главной странице*/
-            basket.items = []; /*Обновили корзину - стерли все товары в ней*/
-            basket.total = 0; /*Обновили сумму в корзине*/
+            /* basket.items = []; */ /*Обновили корзину - стерли все товары в ней*/
+            /* basket.total = 0; */ /*Обновили сумму в корзине*/
             events.emit('order:success', res);
         })
 });
@@ -209,5 +211,9 @@ events.on('order:success', (data: {id: string, total: number}) => {
     })
   })
 });
+
+events.on("payment:toggle", (data: {value: string}) => {
+    order.payment = data.value;
+})
 
 

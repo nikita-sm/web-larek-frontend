@@ -38,16 +38,7 @@ export class Model {
 
     /*Проверка на наличие элемента в корзине*/
     checkInBasket(card:I_CardItem) : boolean {
-        let res: boolean = false;
-        const basket = this.getBasketItems();
-        const length = this.getBasketCount();
-        for(let i = 0; i < length; i++) {
-            if(card.id === basket[i].id) {
-                res = true;
-                break;
-            }
-        }
-        return res;
+        return this.basketItems.includes(card); 
     };
 
      updateBasket(card: I_CardItem){
@@ -87,6 +78,7 @@ export class Model {
     /*Очистка корзины после отправки заказа*/
     clearBasket(){
         this.basketItems.length = 0;
+        this.events.emit("basket:update", this.getBasketItems());
     }
 
     clearOrder(){
@@ -101,13 +93,15 @@ export class Model {
     /*Установить значения в Order*/
     setOrderField(field: keyof IOrderForm, value: string) {
         this.order[field] = value;
-        console.log(this.order);
         if (this.validateContacts()) {
             this.events.emit('contacts:ready', this.order)
         }
         if (this.validateOrder()) {
             this.events.emit('order:ready', this.order);
         }
+        this.events.emit("payment:toggle", {
+            value: this.order[field],
+        });
     }
 
     validateContacts() {

@@ -118,6 +118,7 @@ export class CardItemPreview extends Card<ICardItemPreview> {
     };
 
     set price(value: number | null){
+        super.price = value;
         if(value === null) {
             this.setDisabled(this._buttonBasket, true);
         };

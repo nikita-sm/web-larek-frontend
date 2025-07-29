@@ -26,18 +26,25 @@ export class Order extends Form<IOrder> {
 
 
         if (this._cashButton) {
-            this._cashButton.addEventListener('click', () => {
-                this._cashButton.classList.add('button_alt-active')
-                this._cardButton.classList.remove('button_alt-active')
-                this.onInputChange('payment', 'cash')
+            this._cashButton.addEventListener('click', (event) => {
+                this.onInputChange('payment', 'cash');
             })
         }
         if (this._cardButton) {
-            this._cardButton.addEventListener('click', () => {
-                this._cardButton.classList.add('button_alt-active')
-                this._cashButton.classList.remove('button_alt-active')
-                this.onInputChange('payment', 'card')
+            this._cardButton.addEventListener('click', (event) => {
+                this.onInputChange('payment', 'card');
             })
+        }
+    }
+
+    /*Смена способа оплаты*/
+    set payment(value: string){
+        if(value === "cash") {
+            this._cashButton.classList.add('button_alt-active');
+            this._cardButton.classList.remove('button_alt-active');
+        }else if (value === "card") {
+            this._cashButton.classList.remove('button_alt-active');
+            this._cardButton.classList.add('button_alt-active');
         }
     }
 
